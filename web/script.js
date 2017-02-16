@@ -1,41 +1,9 @@
- var contacts = [
-	{
-		id: 1,
-		name: 'Karry Perry',
-		number: '+79612220055'
-	}, 
-	{
-		id: 2,
-		name: 'Autist',
-		number: '+79617771232'
-	},
-	{
-		id: 3,
-		name: 'Kek',
-		number: '+79611336113'
-	},
-	{
-		id: 4,
-		name: 'Peka',
-		number: '+79614444485'
-	}
-];
+var itemsList = [];
 
-var Contact = React.createClass({
-	render: function() {
-		return (
-			<li className="contact">
-				<div className="contact-name"> {this.props.name} </div>
-				<div className="contact-phone"> {this.props.phone} </div>
-			</li> 
-		);
-	}
-});
-
-var ContactList = React.createClass({
+var CItemsList = React.createClass({
 	getInitialState: function () {
 		return {
-			displayedContacts: contacts
+			itemsList: itemsList
 		}
 	},
 
@@ -51,18 +19,28 @@ var ContactList = React.createClass({
 		});
 	},
 
+	loadListFromBckend: function () {
+		var xhttp = new XMLHttpRequest();
+		var that = this;
+		xhttp.open("get", "http://localhost:5000/api/todo/", true);
+		xhttp.send();
+		xhttp.onreadystatechange = function () {
+			if (this.readyState == 4 && this.status == 200) {
+				that.setState({
+					itemsList: JSON.parse(this.responseText)
+				});
+			}
+		};
+	},
+
 	render: function() {
 		return (
 			<div className="contacts">
-				<input type="text" className="contacts-search_field" onChange={this.handleSearch} />
+				<input type="text" className="contacts-search_field" onChange={this.loadListFromBckend} />
 				<ul className="contacts-list">
 					{
-						this.state.displayedContacts.map(function (element) {
-							return <Contact 
-								key={element.id} 
-								name={element.name} 
-								phone={element.number}
-							/>;
+						this.state.itemsList.map(function (element) {
+							console.log(element.name);
 						})
 					}
 				</ul>
@@ -72,6 +50,6 @@ var ContactList = React.createClass({
 });
 
 ReactDOM.render(
-	<ContactList />,
+	<CItemsList />,
 	document.getElementById("content")
 );
